@@ -24,7 +24,7 @@ const MindMapComponent = ({ data }) => {
   );
 
   return (
-    <div style={{ width: '100%', height: '600px' }}>
+    <div className="mindmap-fullscreen">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -33,7 +33,11 @@ const MindMapComponent = ({ data }) => {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
         attributionPosition="bottom-left"
+        minZoom={0.1}
+        maxZoom={2}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
         <Background />
         <Controls />

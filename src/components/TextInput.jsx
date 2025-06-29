@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const TextInput = ({ onTextSubmit, isLoading = false }) => {
-  const [text, setText] = useState('');
+const TextInput = ({ onTextSubmit, isLoading = false, initialText = '' }) => {
+  const [text, setText] = useState(initialText);
+
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,15 +28,18 @@ const TextInput = ({ onTextSubmit, isLoading = false }) => {
           placeholder="Paste your lecture notes, meeting minutes, or any text here..."
           className="text-area"
           disabled={isLoading}
+          autoFocus
         />
         
-        <button
-          type="submit"
-          disabled={!text.trim() || isLoading}
-          className="generate-button"
-        >
-          {isLoading ? 'Generating Mind Map...' : 'Generate Mind Map'}
-        </button>
+        <div className="text-input-actions">
+          <button
+            type="submit"
+            disabled={!text.trim() || isLoading}
+            className="generate-button"
+          >
+            {isLoading ? 'Generating Mind Map...' : 'Generate Mind Map'}
+          </button>
+        </div>
       </form>
     </div>
   );

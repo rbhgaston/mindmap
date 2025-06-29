@@ -28,15 +28,17 @@ Create a JSON response with the following structure:
   ]
 }
 
-Rules:
-1. Create as many levels as needed to properly organize the information
-2. Each node should have a clear, concise label
-3. Leaf nodes (nodes with no children) MUST have bullets with key points
-4. Middle nodes can have bullets for summary points
-5. Use bullet points, not paragraphs
-6. Keep bullets short and specific
-7. Organize information logically and hierarchically
-8. Extract main concepts, subtopics, and supporting details
+CRITICAL RULES:
+1. ONLY use information that is EXPLICITLY mentioned in the provided text
+2. DO NOT add any external knowledge, interpretations, or additional details
+3. DO NOT expand on concepts beyond what is stated in the text
+4. Extract main concepts, subtopics, and supporting details directly from the text
+5. Keep bullet points concise and factual - only what is stated in the text
+6. If the text is brief, create a simple structure - do not overcomplicate
+7. Use the exact terminology and phrases from the text when possible
+8. Do not infer relationships that are not explicitly stated
+9. If a concept is mentioned but not explained, do not add explanations
+10. Focus on organizing the existing information, not adding new information
 
 Return ONLY valid JSON, no other text.`;
   }
@@ -44,7 +46,6 @@ Return ONLY valid JSON, no other text.`;
   static async generateMindMap(text) {
     if (!GROQ_API_KEY) {
       // Fallback to mock data for development
-      console.log('No API key found, using mock data');
       return this.generateMockMindMap(text);
     }
 
@@ -56,18 +57,18 @@ Return ONLY valid JSON, no other text.`;
           'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: 'llama3-8b-8192',
           messages: [
             {
               role: 'system',
-              content: 'You are a helpful assistant that creates structured mind maps from text. Always respond with valid JSON only.'
+              content: 'You are a helpful assistant that creates structured mind maps from text. You ONLY use information explicitly provided in the text. Do not add external knowledge or interpretations. Always respond with valid JSON only.'
             },
             {
               role: 'user',
               content: this.createPrompt(text)
             }
           ],
-          temperature: 0.3,
+          temperature: 0.1, // Lower temperature for more conservative output
           max_tokens: 2000
         })
       });
