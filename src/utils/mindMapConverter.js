@@ -6,24 +6,20 @@ const LAYOUT_OPTIONS = {
   horizontal: {
     algorithm: 'layered',
     direction: 'RIGHT',
-    baseSpacing: 80,
   },
   vertical: {
     algorithm: 'layered',
     direction: 'DOWN',
-    baseSpacing: 80,
   },
   radial: {
     algorithm: 'radial',
-    baseSpacing: 120,
   },
   force: {
     algorithm: 'force',
-    baseSpacing: 100,
   },
 };
 
-function buildElkGraph(llmNodes, parentId = null, nodes = [], edges = []) {
+function buildElkGraph(llmNodes, parentId = null, nodes = [], edges = [], level = 0) {
   llmNodes.forEach((llmNode) => {
     const nodeId = `node-${nodes.length + 1}`;
     
@@ -73,7 +69,7 @@ function buildElkGraph(llmNodes, parentId = null, nodes = [], edges = []) {
         label: llmNode.label || 'Untitled',
         bullets: llmNode.bullets || [],
         isLeaf: !llmNode.children || llmNode.children.length === 0,
-        level: 0,
+        level: level,
         width: width,
         height: height,
         hiddenBullets: hiddenBullets,
@@ -85,40 +81,46 @@ function buildElkGraph(llmNodes, parentId = null, nodes = [], edges = []) {
       edges.push({ id: `edge-${parentId}-${nodeId}`, source: parentId, target: nodeId });
     }
     if (llmNode.children && llmNode.children.length > 0) {
-      buildElkGraph(llmNode.children, nodeId, nodes, edges);
+      buildElkGraph(llmNode.children, nodeId, nodes, edges, level + 1);
     }
   });
   return { nodes, edges };
 }
 
-function calculateDynamicSpacing(nodes, layoutType) {
-  if (!nodes || nodes.length === 0) return 100;
+function calculateContentAwareSpacing(nodes, layoutType) {
+  if (!nodes || nodes.length === 0) return 50;
   
-  // Calculate average node size
-  const avgWidth = nodes.reduce((sum, node) => sum + (node.width || 200), 0) / nodes.length;
-  const avgHeight = nodes.reduce((sum, node) => sum + (node.height || 100), 0) / nodes.length;
+  // Calculate spacing for each node based on content
+  const nodeSpacings = nodes.map(node => {
+    const contentLength = (node.data?.label?.length || 0) + ((node.data?.bullets?.length || 0) * 20);
+    const level = node.data?.level || 0;
+    const hasManyBullets = (node.data?.bullets?.length || 0) > 4;
+    
+    // Base spacing: 40px minimum for readability
+    let spacing = 40;
+    
+    // Content factor: +2px per 10 characters
+    spacing += Math.floor(contentLength / 10) * 2;
+    
+    // Level factor: Deeper levels get tighter spacing
+    spacing -= level * 5;
+    
+    // Density factor: Nodes with many bullets need more breathing room
+    if (hasManyBullets) spacing += 15;
+    
+    // Layout-specific adjustments
+    if (layoutType === 'radial') {
+      spacing = Math.max(30, spacing * 0.8); // Radial can be tighter
+    } else if (layoutType === 'force') {
+      spacing = Math.max(35, spacing * 0.9); // Force layout slightly tighter
+    }
+    
+    return Math.max(30, Math.min(80, spacing)); // Clamp between 30-80px
+  });
   
-  // Base spacing from layout options
-  const baseSpacing = LAYOUT_OPTIONS[layoutType]?.baseSpacing || 80;
-  
-  // Adjust spacing based on node sizes with overlap prevention
-  let dynamicSpacing = baseSpacing;
-  
-  if (layoutType === 'horizontal' || layoutType === 'vertical') {
-    // For layered layouts, use the larger dimension plus safety margin
-    const maxDimension = Math.max(avgWidth, avgHeight);
-    dynamicSpacing = Math.max(baseSpacing, maxDimension * 1.2);
-  } else if (layoutType === 'radial') {
-    // For radial, consider both dimensions with extra space
-    const avgDimension = (avgWidth + avgHeight) / 2;
-    dynamicSpacing = Math.max(baseSpacing, avgDimension * 1.5);
-  } else if (layoutType === 'force') {
-    // For force layout, use average dimension with safety margin
-    const avgDimension = (avgWidth + avgHeight) / 2;
-    dynamicSpacing = Math.max(baseSpacing, avgDimension * 1.3);
-  }
-  
-  return Math.round(dynamicSpacing);
+  // Return average spacing for the layout
+  const averageSpacing = nodeSpacings.reduce((sum, spacing) => sum + spacing, 0) / nodeSpacings.length;
+  return Math.round(averageSpacing);
 }
 
 export async function elkLayoutedMindMap(llmNodes, layoutType = 'horizontal') {
@@ -136,22 +138,22 @@ export async function elkLayoutedMindMap(llmNodes, layoutType = 'horizontal') {
       targets: [e.target] 
     }));
 
-    // Calculate dynamic spacing based on node sizes
-    const dynamicSpacing = calculateDynamicSpacing(nodes, layoutType);
+    // Calculate content-aware spacing
+    const contentAwareSpacing = calculateContentAwareSpacing(nodes, layoutType);
 
     const elkGraph = {
       id: 'root',
       layoutOptions: {
         'elk.algorithm': LAYOUT_OPTIONS[layoutType]?.algorithm || 'layered',
         'elk.direction': LAYOUT_OPTIONS[layoutType]?.direction,
-        'elk.spacing.nodeNode': dynamicSpacing,
-        'elk.spacing.nodeNodeBetweenLayers': dynamicSpacing * 1.8,
-        'elk.spacing.edgeNode': dynamicSpacing * 0.6,
-        'elk.spacing.edgeEdge': dynamicSpacing * 0.4,
-        'elk.layered.spacing.nodeNodeBetweenLayers': dynamicSpacing * 1.8,
-        'elk.layered.spacing.edgeNodeBetweenLayers': dynamicSpacing * 1.0,
-        'elk.radial.spacing': dynamicSpacing,
-        'elk.force.spacing': dynamicSpacing,
+        'elk.spacing.nodeNode': contentAwareSpacing,
+        'elk.spacing.nodeNodeBetweenLayers': contentAwareSpacing * 1.2,
+        'elk.spacing.edgeNode': contentAwareSpacing * 0.5,
+        'elk.spacing.edgeEdge': contentAwareSpacing * 0.3,
+        'elk.layered.spacing.nodeNodeBetweenLayers': contentAwareSpacing * 1.2,
+        'elk.layered.spacing.edgeNodeBetweenLayers': contentAwareSpacing * 0.8,
+        'elk.radial.spacing': contentAwareSpacing,
+        'elk.force.spacing': contentAwareSpacing,
       },
       children: elkNodes,
       edges: elkEdges,
