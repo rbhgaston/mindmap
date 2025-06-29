@@ -42,6 +42,7 @@ const MindMapNode = ({ data }) => {
   };
 
   const labelLines = wrapText(label);
+  const hasManyBullets = bullets && bullets.length > maxVisibleBullets;
   const visibleBullets = isExpanded ? (bullets || []) : (bullets?.slice(0, maxVisibleBullets) || []);
 
   return (
@@ -65,21 +66,34 @@ const MindMapNode = ({ data }) => {
                 • {bullet}
               </div>
             ))}
-            {isExpandable && !isExpanded && (
-              <button 
-                className="expand-button"
-                onClick={() => setIsExpanded(true)}
-              >
-                +{hiddenBullets} more...
-              </button>
-            )}
-            {isExpandable && isExpanded && (
-              <button 
-                className="collapse-button"
-                onClick={() => setIsExpanded(false)}
-              >
-                Show less
-              </button>
+            
+            {hasManyBullets && (
+              <div className="expand-controls">
+                {!isExpanded && (
+                  <button 
+                    className="expand-arrow-button"
+                    onClick={() => setIsExpanded(true)}
+                    title={`Show ${bullets.length - maxVisibleBullets} more details`}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                    <span className="expand-text">+{bullets.length - maxVisibleBullets}</span>
+                  </button>
+                )}
+                {isExpanded && (
+                  <button 
+                    className="collapse-arrow-button"
+                    onClick={() => setIsExpanded(false)}
+                    title="Show fewer details"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="18,15 12,9 6,15"></polyline>
+                    </svg>
+                    <span className="collapse-text">Less</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}

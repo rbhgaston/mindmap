@@ -438,22 +438,90 @@
 
 .expand-button,
 .collapse-button {
-  background: none;
-  border: none;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
   color: #667eea;
-  font-size: 11px;
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
   transition: all 0.2s ease;
-  font-weight: 500;
-  margin-top: 4px;
+  margin-top: 0.5rem;
+  width: 100%;
 }
 
 .expand-button:hover,
 .collapse-button:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.5);
+}
+
+/* New Expand/Collapse Arrow Button Styles */
+.expand-controls {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.expand-arrow-button,
+.collapse-arrow-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.expand-arrow-button:hover,
+.collapse-arrow-button:hover {
   background: rgba(102, 126, 234, 0.1);
-  color: #5a67d8;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  padding: 0.25rem 0.75rem;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.expand-arrow-button svg,
+.collapse-arrow-button svg {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expand-arrow-button:hover svg {
+  transform: translateY(1px);
+}
+
+.collapse-arrow-button:hover svg {
+  transform: translateY(-1px);
+}
+
+.expand-text,
+.collapse-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.expand-arrow-button:hover .expand-text,
+.collapse-arrow-button:hover .collapse-text {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Responsive Design */
@@ -488,5 +556,164 @@
   .mind-map-node {
     min-width: 150px;
     max-width: 250px;
+  }
+}
+
+/* Edit Dialog Styles */
+.edit-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.edit-dialog {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: dialogSlideIn 0.3s ease-out;
+}
+
+.edit-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.edit-dialog-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.edit-dialog-content {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.edit-dialog-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.cancel-button,
+.save-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.cancel-button:hover {
+  background: #d0d0d0;
+}
+
+.save-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.save-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 768px) {
+  .edit-dialog {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .edit-dialog-header,
+  .edit-dialog-content,
+  .edit-dialog-footer {
+    padding: 1rem;
+  }
+  
+  .edit-dialog-footer {
+    flex-direction: column;
   }
 } 

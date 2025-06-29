@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import ReactFlow, {
   addEdge,
   useNodesState,
@@ -10,6 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import MindMapNode from './MindMapNode.jsx';
+import EditNodeDialog from './EditNodeDialog.jsx';
 
 const nodeTypes = {
   mindMapNode: MindMapNode,
@@ -18,11 +19,31 @@ const nodeTypes = {
 const MindMapComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(data.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(data.edges);
+  const [editingNode, setEditingNode] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
+
+  const onNodeDoubleClick = useCallback((event, node) => {
+    setEditingNode(node);
+    setIsEditDialogOpen(true);
+  }, []);
+
+  const handleSaveNode = useCallback((updatedNode) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === updatedNode.id ? updatedNode : node
+      )
+    );
+  }, [setNodes]);
+
+  const handleCloseEditDialog = useCallback(() => {
+    setIsEditDialogOpen(false);
+    setEditingNode(null);
+  }, []);
 
   return (
     <div className="mindmap-fullscreen">
@@ -32,6 +53,7 @@ const MindMapComponent = ({ data }) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDoubleClick={onNodeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
@@ -54,6 +76,13 @@ const MindMapComponent = ({ data }) => {
           }}
         />
       </ReactFlow>
+      
+      <EditNodeDialog
+        node={editingNode}
+        isOpen={isEditDialogOpen}
+        onClose={handleCloseEditDialog}
+        onSave={handleSaveNode}
+      />
     </div>
   );
 };
