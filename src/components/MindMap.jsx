@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import ReactFlow, {
   addEdge,
   useNodesState,
@@ -16,7 +16,7 @@ const nodeTypes = {
   mindMapNode: MindMapNode,
 };
 
-const MindMapComponent = ({ data }) => {
+const MindMapComponent = ({ data, onNodeUpdate }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(data.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(data.edges);
   const [editingNode, setEditingNode] = useState(null);
@@ -32,25 +32,59 @@ const MindMapComponent = ({ data }) => {
     setIsEditDialogOpen(true);
   }, []);
 
+  // Handle node position changes from React Flow
+  const handleNodesChange = useCallback((changes) => {
+    setNodes((nds) => {
+      const updatedNodes = nds.map((node) => {
+        const change = changes.find((c) => c.id === node.id);
+        if (change && change.type === 'position' && change.position) {
+          return {
+            ...node,
+            position: change.position,
+            positionAbsolute: change.positionAbsolute
+          };
+        }
+        return node;
+      });
+      
+      // Notify parent component of node updates
+      if (onNodeUpdate) {
+        onNodeUpdate(updatedNodes);
+      }
+      return updatedNodes;
+    });
+  }, [setNodes, onNodeUpdate]);
+
   const handleSaveNode = useCallback((updatedNode) => {
-    setNodes((nds) =>
-      nds.map((node) =>
+    setNodes((nds) => {
+      const updatedNodes = nds.map((node) =>
         node.id === updatedNode.id ? updatedNode : node
-      )
-    );
-  }, [setNodes]);
+      );
+      // Notify parent component of node updates
+      if (onNodeUpdate) {
+        onNodeUpdate(updatedNodes);
+      }
+      return updatedNodes;
+    });
+  }, [setNodes, onNodeUpdate]);
 
   const handleCloseEditDialog = useCallback(() => {
     setIsEditDialogOpen(false);
     setEditingNode(null);
   }, []);
 
+  // Update nodes when data changes (e.g., layout change)
+  useEffect(() => {
+    setNodes(data.nodes);
+    setEdges(data.edges);
+  }, [data.nodes, data.edges, setNodes, setEdges]);
+
   return (
     <div className="mindmap-fullscreen">
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDoubleClick={onNodeDoubleClick}

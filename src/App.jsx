@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import TextInput from './components/TextInput.jsx';
 import MindMap from './components/MindMap.jsx';
 import { LLMService } from './utils/llm.js';
 import { elkLayoutedMindMap } from './utils/mindMapConverter.js';
+import { saveState, loadState, clearState } from './utils/persistence.js';
 import './App.css';
 
 const LAYOUTS = [
@@ -21,6 +22,41 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [showTextDialog, setShowTextDialog] = useState(false);
   const [renderKey, setRenderKey] = useState(0); // Force re-render
+
+  // Load saved state on component mount
+  useEffect(() => {
+    const savedState = loadState();
+    if (savedState) {
+      // Restore the saved state
+      if (savedState.mindMapData) {
+        setMindMapData(savedState.mindMapData);
+      }
+      if (savedState.layout) {
+        setLayout(savedState.layout);
+      }
+      if (savedState.llmNodes) {
+        setLlmNodes(savedState.llmNodes);
+      }
+      if (savedState.inputText) {
+        setInputText(savedState.inputText);
+      }
+      setRenderKey(prev => prev + 1);
+    }
+  }, []);
+
+  // Save state whenever relevant data changes
+  useEffect(() => {
+    if (mindMapData || inputText) {
+      const stateToSave = {
+        mindMapData,
+        layout,
+        llmNodes,
+        inputText,
+        timestamp: Date.now()
+      };
+      saveState(stateToSave);
+    }
+  }, [mindMapData, layout, llmNodes, inputText]);
 
   const generateMindMap = useCallback(async (text, selectedLayout = layout) => {
     setIsLoading(true);
@@ -51,6 +87,7 @@ function App() {
     setInputText('');
     setError(null);
     setRenderKey(prev => prev + 1);
+    clearState(); // Clear from localStorage
   }, []);
 
   const handleLayoutChange = useCallback(async (e) => {
@@ -83,6 +120,17 @@ function App() {
   const handleEditText = useCallback(() => {
     setShowTextDialog(true);
   }, []);
+
+  // Handle node updates from the mind map component
+  const handleNodeUpdate = useCallback((updatedNodes) => {
+    if (mindMapData) {
+      const updatedMindMapData = {
+        ...mindMapData,
+        nodes: updatedNodes
+      };
+      setMindMapData(updatedMindMapData);
+    }
+  }, [mindMapData]);
 
   return (
     <div className="app">
@@ -170,7 +218,7 @@ function App() {
       {/* Main Mind Map Area */}
       <div className="main-content">
         {mindMapData ? (
-          <MindMap key={renderKey} data={mindMapData} />
+          <MindMap key={renderKey} data={mindMapData} onNodeUpdate={handleNodeUpdate} />
         ) : (
           <div className="welcome-screen">
             <div className="welcome-content">
