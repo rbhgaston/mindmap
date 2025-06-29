@@ -6,6 +6,7 @@ import ReactFlow, {
   Controls,
   Background,
   ReactFlowProvider,
+  MiniMap,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import MindMapNode from './MindMapNode.jsx';
@@ -41,6 +42,17 @@ const MindMapComponent = ({ data }) => {
       >
         <Background />
         <Controls />
+        <MiniMap 
+          nodeColor="#667eea"
+          nodeStrokeColor="#fff"
+          nodeStrokeWidth={2}
+          maskColor="rgba(0, 0, 0, 0.1)"
+          style={{
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+          }}
+        />
       </ReactFlow>
     </div>
   );
