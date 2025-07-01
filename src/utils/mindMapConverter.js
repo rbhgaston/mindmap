@@ -19,6 +19,7 @@ const LAYOUT_OPTIONS = {
   },
 };
 
+
 function buildElkGraph(llmNodes, parentId = null, nodes = [], edges = [], level = 0) {
   llmNodes.forEach((llmNode) => {
     const nodeId = `node-${nodes.length + 1}`;
@@ -176,8 +177,9 @@ export async function elkLayoutedMindMap(llmNodes, layoutType = 'horizontal') {
       id: e.id,
       source: e.source,
       target: e.target,
-      type: 'straight',
+      type: 'floating',
       style: { strokeWidth: 2, stroke: '#666666' },
+      markerEnd: { type: 'arrow', width: 20, height: 20, color: '#666666' },
     }));
     
     return { nodes: rfNodes, edges: rfEdges };

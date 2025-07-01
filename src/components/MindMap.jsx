@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   useNodesState,
   useEdgesState,
@@ -7,13 +8,19 @@ import ReactFlow, {
   Background,
   ReactFlowProvider,
   MiniMap,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import MindMapNode from './MindMapNode.jsx';
 import EditNodeDialog from './EditNodeDialog.jsx';
+import FloatingEdge from './FloatingEdge.jsx';
+import FloatingConnectionLine from './FloatingConnectionLine.jsx';
 
 const nodeTypes = {
   mindMapNode: MindMapNode,
+};
+
+const edgeTypes = {
+  floating: FloatingEdge,
 };
 
 const MindMapComponent = ({ data, onNodeUpdate }) => {
@@ -22,10 +29,10 @@ const MindMapComponent = ({ data, onNodeUpdate }) => {
   const [editingNode, setEditingNode] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+    const onConnect = useCallback(
+      (params) => setEdges((eds) => addEdge({ ...params, type: 'floating' }, eds)),
+      [setEdges]
+    );
 
   const onNodeDoubleClick = useCallback((event, node) => {
     setEditingNode(node);
@@ -89,12 +96,15 @@ const MindMapComponent = ({ data, onNodeUpdate }) => {
         onConnect={onConnect}
         onNodeDoubleClick={onNodeDoubleClick}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        connectionLineComponent={FloatingConnectionLine}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         attributionPosition="bottom-left"
         minZoom={0.1}
         maxZoom={2}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+
       >
         <Background />
         <Controls />
