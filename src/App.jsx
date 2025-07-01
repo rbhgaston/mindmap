@@ -3,7 +3,7 @@ import TextInput from './components/TextInput.jsx';
 import MindMap from './components/MindMap.jsx';
 import { LLMService } from './utils/llm.js';
 import { elkLayoutedMindMap } from './utils/mindMapConverter.js';
-import { saveState, loadState, clearState } from './utils/persistence.js';
+import { saveState, loadState, clearState, saveLayoutState, loadLayoutState } from './utils/persistence.js';
 import './App.css';
 
 const LAYOUTS = [
@@ -22,6 +22,7 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [showTextDialog, setShowTextDialog] = useState(false);
   const [renderKey, setRenderKey] = useState(0); // Force re-render
+  const [layoutStates, setLayoutStates] = useState({}); // Store states for each layout
 
   // Load saved state on component mount
   useEffect(() => {
@@ -44,11 +45,11 @@ function App() {
     }
   }, []);
 
-  // Save state whenever relevant data changes
+  // Save state whenever relevant data changes (excluding layout-specific data)
   useEffect(() => {
     if (mindMapData || inputText) {
       const stateToSave = {
-        mindMapData,
+        mindMapData, // Keep this for browser reload
         layout,
         llmNodes,
         inputText,
@@ -57,6 +58,23 @@ function App() {
       saveState(stateToSave);
     }
   }, [mindMapData, layout, llmNodes, inputText]);
+
+  // Save layout-specific state when mind map data changes
+  useEffect(() => {
+    if (mindMapData && layout) {
+      const layoutState = {
+        mindMapData,
+        timestamp: Date.now()
+      };
+      saveLayoutState(layout, layoutState);
+      
+      // Update local layout states
+      setLayoutStates(prev => ({
+        ...prev,
+        [layout]: layoutState
+      }));
+    }
+  }, [mindMapData, layout]);
 
   const generateMindMap = useCallback(async (text, selectedLayout = layout) => {
     setIsLoading(true);
@@ -86,6 +104,7 @@ function App() {
     setLlmNodes(null);
     setInputText('');
     setError(null);
+    setLayoutStates({});
     setRenderKey(prev => prev + 1);
     clearState(); // Clear from localStorage
   }, []);
@@ -93,18 +112,29 @@ function App() {
   const handleLayoutChange = useCallback(async (e) => {
     const newLayout = e.target.value;
     setLayout(newLayout);
+    
     if (llmNodes && Array.isArray(llmNodes) && llmNodes.length > 0) {
-      setIsLoading(true);
-      try {
-        console.log('Switching layout. LLM nodes:', llmNodes);
-        const reactFlowData = await elkLayoutedMindMap(llmNodes, newLayout);
-        setMindMapData(reactFlowData);
-        setRenderKey(prev => prev + 1); // Force re-render
-      } catch (err) {
-        setError('Failed to change layout.');
-        console.error('Layout change error:', err);
-      } finally {
-        setIsLoading(false);
+      // Check if we have saved state for this layout
+      const savedLayoutState = loadLayoutState(newLayout);
+      
+      if (savedLayoutState && savedLayoutState.mindMapData) {
+        // Use saved layout state
+        setMindMapData(savedLayoutState.mindMapData);
+        setRenderKey(prev => prev + 1);
+      } else {
+        // Generate new layout
+        setIsLoading(true);
+        try {
+          console.log('Switching layout. LLM nodes:', llmNodes);
+          const reactFlowData = await elkLayoutedMindMap(llmNodes, newLayout);
+          setMindMapData(reactFlowData);
+          setRenderKey(prev => prev + 1); // Force re-render
+        } catch (err) {
+          setError('Failed to change layout.');
+          console.error('Layout change error:', err);
+        } finally {
+          setIsLoading(false);
+        }
       }
     } else {
       console.warn('No LLM nodes available for layout change:', llmNodes);

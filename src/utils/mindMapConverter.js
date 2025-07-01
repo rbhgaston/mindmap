@@ -179,7 +179,6 @@ export async function elkLayoutedMindMap(llmNodes, layoutType = 'horizontal') {
       target: e.target,
       type: 'floating',
       style: { strokeWidth: 2, stroke: '#666666' },
-      markerEnd: { type: 'arrow', width: 20, height: 20, color: '#666666' },
     }));
     
     return { nodes: rfNodes, edges: rfEdges };
