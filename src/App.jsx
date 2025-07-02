@@ -76,15 +76,28 @@ function App() {
     }
   }, [mindMapData, layout]);
 
-  const generateMindMap = useCallback(async (text, selectedLayout = layout) => {
+  const generateMindMapForAllLayouts = useCallback(async (text, llmNodesResult = null) => {
     setIsLoading(true);
     setError(null);
     setInputText(text);
     try {
-      const llmNodesResult = await LLMService.generateMindMap(text);
-      setLlmNodes(llmNodesResult);
-      const reactFlowData = await elkLayoutedMindMap(llmNodesResult, selectedLayout);
-      setMindMapData(reactFlowData);
+      // Use provided LLM nodes or generate new ones
+      const llmNodesData = llmNodesResult || await LLMService.generateMindMap(text);
+      setLlmNodes(llmNodesData);
+      const layouts = ['horizontal', 'vertical', 'radial', 'force'];
+      const layoutStatesObj = {};
+      let currentLayoutData = null;
+      for (const layoutType of layouts) {
+        const reactFlowData = await elkLayoutedMindMap(llmNodesData, layoutType);
+        const layoutState = { mindMapData: reactFlowData, timestamp: Date.now() };
+        saveLayoutState(layoutType, layoutState);
+        layoutStatesObj[layoutType] = layoutState;
+        if (layoutType === layout) {
+          currentLayoutData = reactFlowData;
+        }
+      }
+      setMindMapData(currentLayoutData);
+      setLayoutStates(layoutStatesObj);
       setRenderKey(prev => prev + 1); // Force re-render
       setShowTextDialog(false);
     } catch (err) {
@@ -94,6 +107,10 @@ function App() {
       setIsLoading(false);
     }
   }, [layout]);
+
+  const generateMindMap = useCallback(async (text, selectedLayout = layout) => {
+    await generateMindMapForAllLayouts(text);
+  }, [generateMindMapForAllLayouts]);
 
   const handleTextSubmit = useCallback(async (text) => {
     await generateMindMap(text);
@@ -143,9 +160,9 @@ function App() {
 
   const handleRegenerate = useCallback(async () => {
     if (inputText.trim()) {
-      await generateMindMap(inputText);
+      await generateMindMapForAllLayouts(inputText);
     }
-  }, [inputText, generateMindMap]);
+  }, [inputText, generateMindMapForAllLayouts]);
 
   const handleEditText = useCallback(() => {
     setShowTextDialog(true);
