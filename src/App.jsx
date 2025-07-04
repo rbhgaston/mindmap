@@ -184,7 +184,7 @@ function App() {
       {/* Left Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header">
-          <h1>🧠 AI Mind Map</h1>
+          <h1>AI Mind Map</h1>
           <p>Transform text into interactive mind maps</p>
         </div>
 
@@ -215,7 +215,7 @@ function App() {
                 className="text-input-trigger"
                 onClick={handleEditText}
               >
-                <span>📝</span>
+                <span>Enter</span>
                 <span>Enter your text here...</span>
               </button>
             ) : (
@@ -231,14 +231,14 @@ function App() {
                     className="edit-text-btn"
                     onClick={handleEditText}
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button 
                     className="regenerate-btn"
                     onClick={handleRegenerate}
                     disabled={isLoading}
                   >
-                    🔄 Regenerate
+                    Regenerate
                   </button>
                 </div>
               </div>
@@ -249,7 +249,7 @@ function App() {
           <div className="actions-section">
             {mindMapData && (
               <button onClick={handleReset} className="reset-button">
-                🗑️ Clear Mind Map
+                Clear Mind Map
               </button>
             )}
           </div>
@@ -275,7 +275,7 @@ function App() {
                 className="start-button"
                 onClick={handleEditText}
               >
-                🚀 Start Creating
+                Start Creating
               </button>
             </div>
           </div>
@@ -292,7 +292,7 @@ function App() {
                 className="close-dialog"
                 onClick={() => setShowTextDialog(false)}
               >
-                ✕
+                ×
               </button>
             </div>
             <TextInput 

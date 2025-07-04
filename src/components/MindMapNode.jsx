@@ -56,7 +56,7 @@ const MindMapNode = ({ data }) => {
               {line}
             </div>
           ))}
-          {isLeaf && <span className="leaf-indicator">●</span>}
+          {isLeaf && <span className="leaf-indicator">•</span>}
         </div>
         
         {visibleBullets && visibleBullets.length > 0 && (
