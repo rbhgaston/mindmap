@@ -23,6 +23,8 @@ function App() {
   const [showTextDialog, setShowTextDialog] = useState(false);
   const [renderKey, setRenderKey] = useState(0); // Force re-render
   const [layoutStates, setLayoutStates] = useState({}); // Store states for each layout
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Load saved state on component mount
   useEffect(() => {
@@ -168,6 +170,18 @@ function App() {
     setShowTextDialog(true);
   }, []);
 
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed(prev => !prev);
+  }, []);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
   // Handle node updates from the mind map component
   const handleNodeUpdate = useCallback((updatedNodes) => {
     if (mindMapData) {
@@ -181,79 +195,117 @@ function App() {
 
   return (
     <div className="app">
+      {/* Mobile Hamburger Menu */}
+      <button 
+        className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+      </button>
+
       {/* Left Sidebar */}
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <h1>AI Mind Map</h1>
           <p>Transform text into interactive mind maps</p>
+          <button 
+            className="sidebar-toggle"
+            onClick={toggleSidebar}
+            title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isSidebarCollapsed ? '→' : '←'}
+          </button>
         </div>
 
-        <div className="sidebar-content">
-          {/* Layout Selector */}
-          <div className="layout-section">
-            <h3>Layout Type</h3>
-            <div className="layout-grid">
-              {LAYOUTS.map((l) => (
-                <button
-                  key={l.value}
-                  className={`layout-option ${layout === l.value ? 'active' : ''}`}
-                  onClick={() => handleLayoutChange({ target: { value: l.value } })}
-                  disabled={!mindMapData}
+        {!isSidebarCollapsed && (
+          <div className="sidebar-content">
+            {/* Layout Selector */}
+            <div className="layout-section">
+              <h3>Layout Type</h3>
+              <div className="layout-grid">
+                {LAYOUTS.map((l) => (
+                  <button
+                    key={l.value}
+                    className={`layout-option ${layout === l.value ? 'active' : ''}`}
+                    onClick={() => {
+                      handleLayoutChange({ target: { value: l.value } });
+                      closeMobileMenu();
+                    }}
+                    disabled={!mindMapData}
+                  >
+                    <span className="layout-icon">{l.icon}</span>
+                    <span className="layout-label">{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Text Input Section */}
+            <div className="text-section">
+              <h3>Input Text</h3>
+              {!mindMapData ? (
+                <button 
+                  className="text-input-trigger"
+                  onClick={() => {
+                    handleEditText();
+                    closeMobileMenu();
+                  }}
                 >
-                  <span className="layout-icon">{l.icon}</span>
-                  <span className="layout-label">{l.label}</span>
+                  <span>Enter</span>
+                  <span>Enter your text here...</span>
                 </button>
-              ))}
+              ) : (
+                <div className="text-display">
+                  <div className="text-preview">
+                    {inputText.length > 200 
+                      ? `${inputText.substring(0, 200)}...` 
+                      : inputText
+                    }
+                  </div>
+                  <div className="text-actions">
+                    <button 
+                      className="edit-text-btn"
+                      onClick={() => {
+                        handleEditText();
+                        closeMobileMenu();
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      className="regenerate-btn"
+                      onClick={() => {
+                        handleRegenerate();
+                        closeMobileMenu();
+                      }}
+                      disabled={isLoading}
+                    >
+                      Regenerate
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="actions-section">
+              {mindMapData && (
+                <button 
+                  onClick={() => {
+                    handleReset();
+                    closeMobileMenu();
+                  }} 
+                  className="reset-button"
+                >
+                  Clear Mind Map
+                </button>
+              )}
             </div>
           </div>
-
-          {/* Text Input Section */}
-          <div className="text-section">
-            <h3>Input Text</h3>
-            {!mindMapData ? (
-              <button 
-                className="text-input-trigger"
-                onClick={handleEditText}
-              >
-                <span>Enter</span>
-                <span>Enter your text here...</span>
-              </button>
-            ) : (
-              <div className="text-display">
-                <div className="text-preview">
-                  {inputText.length > 200 
-                    ? `${inputText.substring(0, 200)}...` 
-                    : inputText
-                  }
-                </div>
-                <div className="text-actions">
-                  <button 
-                    className="edit-text-btn"
-                    onClick={handleEditText}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    className="regenerate-btn"
-                    onClick={handleRegenerate}
-                    disabled={isLoading}
-                  >
-                    Regenerate
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="actions-section">
-            {mindMapData && (
-              <button onClick={handleReset} className="reset-button">
-                Clear Mind Map
-              </button>
-            )}
-          </div>
-        </div>
+        )}
 
         {error && (
           <div className="error-message">
@@ -261,6 +313,11 @@ function App() {
           </div>
         )}
       </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-overlay" onClick={closeMobileMenu}></div>
+      )}
 
       {/* Main Mind Map Area */}
       <div className="main-content">
