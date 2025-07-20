@@ -43,10 +43,17 @@ const MindMapNode = ({ data }) => {
 
   const labelLines = wrapText(label);
   const hasManyBullets = bullets && bullets.length > maxVisibleBullets;
-  const visibleBullets = isExpanded ? (bullets || []) : (bullets?.slice(0, maxVisibleBullets) || []);
+  
+  // Filter out empty or whitespace-only bullets
+  const filteredBullets = (bullets || []).filter(bullet => 
+    bullet && typeof bullet === 'string' && bullet.trim().length > 0
+  );
+  
+  const visibleBullets = isExpanded ? filteredBullets : filteredBullets.slice(0, maxVisibleBullets);
+  const hasFilteredManyBullets = filteredBullets.length > maxVisibleBullets;
 
   return (
-    <div className="mind-map-node">
+    <div className="mind-map-node" data-level={level || 0}>
       <Handle 
         type="target" 
         position={targetPosition} 
@@ -67,22 +74,22 @@ const MindMapNode = ({ data }) => {
           <div className="node-bullets">
             {visibleBullets.map((bullet, index) => (
               <div key={index} className="bullet-point">
-                • {bullet}
+                {bullet}
               </div>
             ))}
             
-            {hasManyBullets && (
+            {hasFilteredManyBullets && (
               <div className="expand-controls">
                 {!isExpanded && (
                   <button 
                     className="expand-arrow-button"
                     onClick={() => setIsExpanded(true)}
-                    title={`Show ${bullets.length - maxVisibleBullets} more details`}
+                    title={`Show ${filteredBullets.length - maxVisibleBullets} more details`}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6,9 12,15 18,9"></polyline>
                     </svg>
-                    <span className="expand-text">+{bullets.length - maxVisibleBullets}</span>
+                    <span className="expand-text">+{filteredBullets.length - maxVisibleBullets}</span>
                   </button>
                 )}
                 {isExpanded && (

@@ -5,6 +5,47 @@
   --color-foreground: #1e293b;   /* Deep slate */
   --color-accent: #3b82f6;       /* Vibrant blue */
   --color-highlight: #1e40af;    /* Darker blue for better contrast */
+  
+  /* Level-based color scheme - sophisticated palette */
+  /* Level 0 - Deep Blue (Root) */
+  --level-0-border: #1e40af;
+  --level-0-bg: #eff6ff;
+  --level-0-shadow: rgba(30, 64, 175, 0.15);
+  
+  /* Level 1 - Emerald Green */
+  --level-1-border: #059669;
+  --level-1-bg: #ecfdf5;
+  --level-1-shadow: rgba(5, 150, 105, 0.15);
+  
+  /* Level 2 - Amber Orange */
+  --level-2-border: #d97706;
+  --level-2-bg: #fffbeb;
+  --level-2-shadow: rgba(217, 119, 6, 0.15);
+  
+  /* Level 3 - Purple */
+  --level-3-border: #7c3aed;
+  --level-3-bg: #f5f3ff;
+  --level-3-shadow: rgba(124, 58, 237, 0.15);
+  
+  /* Level 4 - Rose Pink */
+  --level-4-border: #e11d48;
+  --level-4-bg: #fff1f2;
+  --level-4-shadow: rgba(225, 29, 72, 0.15);
+  
+  /* Level 5 - Teal */
+  --level-5-border: #0d9488;
+  --level-5-bg: #f0fdfa;
+  --level-5-shadow: rgba(13, 148, 136, 0.15);
+  
+  /* Level 6 - Indigo */
+  --level-6-border: #4f46e5;
+  --level-6-bg: #eef2ff;
+  --level-6-shadow: rgba(79, 70, 229, 0.15);
+  
+  /* Level 7+ - Slate (fallback) */
+  --level-7-border: #475569;
+  --level-7-bg: #f8fafc;
+  --level-7-shadow: rgba(71, 85, 105, 0.15);
 }
 
 /* Custom Scrollbar Styles */
@@ -481,19 +522,119 @@
   text-align: center;
 }
 
+/* React Flow Node Override - Remove default styling */
+.react-flow__node {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
 /* Mind Map Node Styles */
 .mind-map-node {
   background: white;
   border-radius: 12px;
+  border: 3px solid transparent;
   padding: 12px;
   min-width: 180px;
   max-width: 280px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .mind-map-node:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Level-based styling */
+.mind-map-node[data-level="0"] {
+  border-color: var(--level-0-border);
+  background: var(--level-0-bg);
+  box-shadow: 0 4px 12px var(--level-0-shadow);
+}
+
+.mind-map-node[data-level="0"]:hover {
+  box-shadow: 0 6px 20px var(--level-0-shadow);
+}
+
+.mind-map-node[data-level="1"] {
+  border-color: var(--level-1-border);
+  background: var(--level-1-bg);
+  box-shadow: 0 4px 12px var(--level-1-shadow);
+}
+
+.mind-map-node[data-level="1"]:hover {
+  box-shadow: 0 6px 20px var(--level-1-shadow);
+}
+
+.mind-map-node[data-level="2"] {
+  border-color: var(--level-2-border);
+  background: var(--level-2-bg);
+  box-shadow: 0 4px 12px var(--level-2-shadow);
+}
+
+.mind-map-node[data-level="2"]:hover {
+  box-shadow: 0 6px 20px var(--level-2-shadow);
+}
+
+.mind-map-node[data-level="3"] {
+  border-color: var(--level-3-border);
+  background: var(--level-3-bg);
+  box-shadow: 0 4px 12px var(--level-3-shadow);
+}
+
+.mind-map-node[data-level="3"]:hover {
+  box-shadow: 0 6px 20px var(--level-3-shadow);
+}
+
+.mind-map-node[data-level="4"] {
+  border-color: var(--level-4-border);
+  background: var(--level-4-bg);
+  box-shadow: 0 4px 12px var(--level-4-shadow);
+}
+
+.mind-map-node[data-level="4"]:hover {
+  box-shadow: 0 6px 20px var(--level-4-shadow);
+}
+
+.mind-map-node[data-level="5"] {
+  border-color: var(--level-5-border);
+  background: var(--level-5-bg);
+  box-shadow: 0 4px 12px var(--level-5-shadow);
+}
+
+.mind-map-node[data-level="5"]:hover {
+  box-shadow: 0 6px 20px var(--level-5-shadow);
+}
+
+.mind-map-node[data-level="6"] {
+  border-color: var(--level-6-border);
+  background: var(--level-6-bg);
+  box-shadow: 0 4px 12px var(--level-6-shadow);
+}
+
+.mind-map-node[data-level="6"]:hover {
+  box-shadow: 0 6px 20px var(--level-6-shadow);
+}
+
+/* Level 7+ fallback */
+.mind-map-node[data-level="7"],
+.mind-map-node[data-level="8"],
+.mind-map-node[data-level="9"],
+.mind-map-node:not([data-level]) {
+  border-color: var(--level-7-border);
+  background: var(--level-7-bg);
+  box-shadow: 0 4px 12px var(--level-7-shadow);
+}
+
+.mind-map-node[data-level="7"]:hover,
+.mind-map-node[data-level="8"]:hover,
+.mind-map-node[data-level="9"]:hover,
+.mind-map-node:not([data-level]):hover {
+  box-shadow: 0 6px 20px var(--level-7-shadow);
 }
 
 .node-content {
@@ -510,6 +651,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
+  position: relative;
 }
 
 .label-line {
@@ -528,6 +670,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: 4px;
 }
 
 .bullet-point {
@@ -536,6 +679,52 @@
   line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  position: relative;
+  padding-left: 12px;
+}
+
+.bullet-point::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: inherit;
+  font-weight: bold;
+}
+
+/* Level-based bullet styling for visual hierarchy */
+.mind-map-node[data-level="0"] .bullet-point::before {
+  color: var(--level-0-border);
+}
+
+.mind-map-node[data-level="1"] .bullet-point::before {
+  color: var(--level-1-border);
+}
+
+.mind-map-node[data-level="2"] .bullet-point::before {
+  color: var(--level-2-border);
+}
+
+.mind-map-node[data-level="3"] .bullet-point::before {
+  color: var(--level-3-border);
+}
+
+.mind-map-node[data-level="4"] .bullet-point::before {
+  color: var(--level-4-border);
+}
+
+.mind-map-node[data-level="5"] .bullet-point::before {
+  color: var(--level-5-border);
+}
+
+.mind-map-node[data-level="6"] .bullet-point::before {
+  color: var(--level-6-border);
+}
+
+.mind-map-node[data-level="7"] .bullet-point::before,
+.mind-map-node[data-level="8"] .bullet-point::before,
+.mind-map-node[data-level="9"] .bullet-point::before,
+.mind-map-node:not([data-level]) .bullet-point::before {
+  color: var(--level-7-border);
 }
 
 .expand-button,
@@ -997,19 +1186,4 @@
   box-shadow: 0 4px 15px var(--color-accent);
 }
 
-@media (max-width: 768px) {
-  .edit-dialog {
-    width: 95%;
-    margin: 1rem;
-  }
-  
-  .edit-dialog-header,
-  .edit-dialog-content,
-  .edit-dialog-footer {
-    padding: 1rem;
-  }
-  
-  .edit-dialog-footer {
-    flex-direction: column;
-  }
-} 
+/* Level hierarchy indicators - removed dot indicator */
