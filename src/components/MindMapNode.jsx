@@ -13,7 +13,7 @@ const MindMapNode = ({ data }) => {
     maxVisibleBullets = 4
   } = data;
 
-  const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
   // Determine handle positions based on layout
   const isHorizontal = layout === 'horizontal';
@@ -47,7 +47,11 @@ const MindMapNode = ({ data }) => {
 
   return (
     <div className="mind-map-node">
-      <Handle type="target" position={targetPosition} />
+      <Handle 
+        type="target" 
+        position={targetPosition} 
+        style={{ opacity: 0, width: 0, height: 0 }}
+      />
       
       <div className="node-content">
         <div className="node-label">
@@ -99,7 +103,11 @@ const MindMapNode = ({ data }) => {
         )}
       </div>
       
-      <Handle type="source" position={sourcePosition} />
+      <Handle 
+        type="source" 
+        position={sourcePosition} 
+        style={{ opacity: 0, width: 0, height: 0 }}
+      />
     </div>
   );
 };

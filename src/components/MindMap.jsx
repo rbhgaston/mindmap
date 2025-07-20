@@ -108,9 +108,10 @@ const MindMapComponent = ({ data, onNodeUpdate }) => {
       >
         <Background />
         <Controls />
-        <MiniMap 
+         
+        {/*<MiniMap 
           nodeColor="#667eea"
-          nodeStrokeColor="#fff"
+          nodeStrokeColor="rgba(0, 0, 0, 0.1)"
           nodeStrokeWidth={2}
           maskColor="rgba(0, 0, 0, 0.1)"
           style={{
@@ -118,7 +119,7 @@ const MindMapComponent = ({ data, onNodeUpdate }) => {
             border: '1px solid #e0e0e0',
             borderRadius: '8px',
           }}
-        />
+        />*/}
       </ReactFlow>
       
       <EditNodeDialog

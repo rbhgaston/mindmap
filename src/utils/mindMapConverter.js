@@ -243,6 +243,7 @@ export class MindMapConverter {
 
     const nodes = [node];
     const edges = [];
+    
 
     // Create edge from parent if exists
     if (parentId) {
