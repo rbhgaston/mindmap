@@ -1,5 +1,7 @@
 # AI Mind Map Generator
 
+**Live Demo:** The website is hosted with Vercel at [https://mindmap-eight-lyart.vercel.app](https://mindmap-eight-lyart.vercel.app)
+
 A React-based application that uses AI to convert raw text into interactive, multi-level mind maps with bullet points on all nodes.
 
 ## Features
@@ -15,7 +17,7 @@ A React-based application that uses AI to convert raw text into interactive, mul
 
 - **Frontend**: React 18 with JavaScript
 - **Visualization**: React Flow
-- **AI**: Groq Cloud API (Llama 3-8B model)
+- **AI**: Groq Cloud API (Llama 3-70B model)
 - **Build Tool**: Vite
 - **Styling**: CSS with minimal theme
 
@@ -69,29 +71,41 @@ A React-based application that uses AI to convert raw text into interactive, mul
 3. **Node Creation**: Converts the structure into React Flow nodes with bullet points
 4. **Visualization**: Renders an interactive mind map with proper positioning and connections
 
-## Project Structure
+### **Project Structure**
 
 ```
-src/
-├── components/
-│   ├── MindMap.jsx          # Main React Flow component
-│   ├── MindMapNode.jsx      # Custom node component with bullets
-│   └── TextInput.jsx        # Text input and form handling
-├── utils/
-│   ├── llm.js              # Groq Cloud API integration
-│   └── mindMapConverter.js # Convert LLM output to React Flow format
-├── App.jsx                 # Main application component
-├── main.jsx               # React entry point
-└── index.css              # Global styles
+mindmap/
+├── index.html                # HTML entry point
+├── package.json              # Project metadata and dependencies
+├── vite.config.mjs           # Vite configuration
+├── README.md                 # Project documentation
+├── LICENSE                   # License file
+├── src/
+│   ├── App.jsx               # Main application component
+│   ├── App.css               # Main application styles
+│   ├── index.css             # Global styles
+│   ├── main.jsx              # React entry point
+│   ├── components/
+│   │   ├── MindMap.jsx               # Main React Flow mind map component
+│   │   ├── MindMapNode.jsx           # Custom node component with bullets
+│   │   ├── EditNodeDialog.jsx        # Dialog for editing nodes
+│   │   ├── FloatingConnectionLine.jsx# Custom connection line for edges
+│   │   ├── FloatingEdge.jsx          # Custom edge type for floating edges
+│   │   └── TextInput.jsx             # Text input and form handling
+│   └── utils/
+│       ├── llm.js                    # Groq Cloud API integration and mock data
+│       ├── mindMapConverter.js       # Convert LLM output to React Flow format and layout
+│       ├── persistence.js            # Local storage helpers for saving/loading state
+│       └── floatingEdgeCalculator.js # Utility for edge positioning
 ```
 
 ## API Configuration
 
 The app uses Groq Cloud's Llama 3-8B model with the following configuration:
 
-- **Model**: llama3-8b-8192
+- **Model**: llama3-70b-8192
 - **Temperature**: 0.3 (for consistent, structured output)
-- **Max Tokens**: 2000
+- **Max Tokens**: 8192
 - **System Prompt**: Optimized for mind map generation
 
 ## Development
